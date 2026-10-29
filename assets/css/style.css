@@ -1,0 +1,1768 @@
+/* ==========================================================================
+   SWISS INTERNATIONAL TYPOGRAPHIC STYLE — DIGITAL PHOTOGRAPHY PORTFOLIO
+   Design Influence: A24 (a24.raviklaassens.com) & Modern Swiss Poster Design
+   Faculty of Applied & Creative Arts (FACA), UNIMAS — GKU 1033
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design System & CSS Variables
+   -------------------------------------------------------------------------- */
+:root {
+  /* Swiss Canvas (Signature Clean Gallery Paper) */
+  --bg-canvas: #f8f8f9;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f1f1f4;
+  --bg-dock: rgba(248, 248, 249, 0.95);
+  
+  --ink-primary: #111215;
+  --ink-secondary: #4a4b54;
+  --ink-dim: #888994;
+  --ink-hairline: rgba(17, 18, 21, 0.1);
+  --ink-border: rgba(17, 18, 21, 0.18);
+  
+  /* Swiss Iconic Red Accent */
+  --swiss-red: #e63946;
+  --swiss-red-soft: rgba(230, 57, 70, 0.12);
+  --swiss-red-border: rgba(230, 57, 70, 0.35);
+  
+  --font-swiss: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Grotesk', -apple-system, monospace;
+  
+  --ease-a24: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-fast: 0.22s var(--ease-a24);
+  --transition-mid: 0.45s var(--ease-a24);
+  --transition-slow: 0.75s var(--ease-a24);
+}
+
+/* Darkroom Noir Mode */
+body.theme-noir {
+  --bg-canvas: #0e0f12;
+  --bg-surface: #16171c;
+  --bg-card: #1c1d24;
+  --bg-card-subtle: #24252f;
+  --bg-dock: rgba(14, 15, 18, 0.95);
+  
+  --ink-primary: #f5f5f7;
+  --ink-secondary: #a4a5b0;
+  --ink-dim: #676875;
+  --ink-hairline: rgba(255, 255, 255, 0.1);
+  --ink-border: rgba(255, 255, 255, 0.2);
+  
+  --swiss-red: #ff4757;
+  --swiss-red-soft: rgba(255, 71, 87, 0.15);
+  --swiss-red-border: rgba(255, 71, 87, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   2. Reset & Base Typography
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  font-family: var(--font-swiss);
+  overflow-x: hidden;
+  line-height: 1.5;
+  transition: background-color var(--transition-mid), color var(--transition-mid);
+}
+
+/* Subtle Film Grain */
+.film-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 998;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Custom Drag Tracker */
+.custom-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  mix-blend-mode: difference;
+  color: #fff;
+  opacity: 0;
+}
+
+.custom-cursor.active {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.cursor-label {
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* --------------------------------------------------------------------------
+   3. Swiss Navigation Header
+   -------------------------------------------------------------------------- */
+.swiss-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  z-index: 100;
+  border-bottom: 1px solid var(--ink-hairline);
+  background: var(--bg-dock);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.brand-monogram {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--ink-primary);
+}
+
+.swiss-square {
+  width: 12px;
+  height: 12px;
+  background: var(--swiss-red);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.brand-title {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 1.5px;
+}
+
+.brand-divider {
+  opacity: 0.3;
+}
+
+.brand-sub {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+}
+
+/* Nav Pills */
+.header-nav {
+  display: flex;
+  gap: 0.35rem;
+  background: var(--bg-surface);
+  padding: 0.3rem 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid var(--ink-hairline);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.nav-pill {
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  padding: 0.45rem 1.15rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nav-pill:hover {
+  color: var(--ink-primary);
+}
+
+.nav-pill.active {
+  background: var(--ink-primary);
+  color: var(--bg-canvas);
+  font-weight: 600;
+}
+
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--swiss-red);
+}
+
+/* Header Right */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.live-clock {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+}
+
+.clock-digits {
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.icon-toggle-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--ink-hairline);
+  color: var(--ink-primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: var(--transition-fast);
+}
+
+.icon-toggle-btn:hover {
+  border-color: var(--ink-border);
+  background: var(--bg-card-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   4. Viewports & Transitions
+   -------------------------------------------------------------------------- */
+.main-viewport {
+  padding-top: 64px;
+  padding-bottom: 56px;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* FIX: Absolute positioning to stop inactive panels taking up scroll space */
+.view-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.35s var(--ease-a24), transform 0.35s var(--ease-a24), visibility 0.35s;
+}
+
+.view-panel.active {
+  position: relative;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   5. VIEW 1: SWISS PHOTOGRAPHIC CARD SLIDER
+   -------------------------------------------------------------------------- */
+#crateView {
+  padding: 1.5rem 0 3rem;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.stage-eyebrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow-item.center-align {
+  align-items: center;
+}
+
+.eyebrow-item.right-align {
+  align-items: flex-end;
+}
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+.mono-val {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.stage-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  padding: 0.3rem 1rem;
+  border-radius: 4px;
+  background: var(--swiss-red-soft);
+  color: var(--swiss-red);
+  border: 1px solid var(--swiss-red-border);
+}
+
+/* HORIZONTAL STAGE CAROUSEL */
+.crate-stage-wrapper {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.crate-stage-wrapper:active {
+  cursor: grabbing;
+}
+
+.crate-track {
+  display: flex;
+  align-items: center;
+  gap: 5.5rem;
+  position: relative;
+  transition: transform 0.6s var(--ease-a24);
+  will-change: transform;
+}
+
+/* SWISS PHOTOGRAPHIC CARD (Rectangular Fine-Art Mount) */
+.photo-card-item {
+  position: relative;
+  width: 310px;
+  height: 410px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.6s var(--ease-a24), opacity 0.5s ease;
+  opacity: 0.42;
+  transform: scale(0.88);
+}
+
+.photo-card-item.active {
+  opacity: 1;
+  transform: scale(1.12);
+  z-index: 20;
+}
+
+.card-outer-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* A24 Signature Hand-Drawn Selection Frame (Organic Swiss Red Rectangle) */
+/* FIX: Restored to fit inside exactly */
+.hand-drawn-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  color: var(--swiss-red);
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.45s var(--ease-a24), transform 0.55s var(--ease-spring);
+  z-index: 25;
+}
+
+.photo-card-item.active .hand-drawn-frame {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Museum Mat Mount Body */
+.swiss-mount-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--ink-border);
+  border-radius: 8px;
+  padding: 12px 12px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 
+    0 15px 35px -10px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.6s var(--ease-a24), transform 0.4s var(--ease-a24);
+}
+
+.photo-card-item.active .swiss-mount-card {
+  box-shadow: 
+    0 35px 70px -15px rgba(0, 0, 0, 0.32),
+    0 10px 25px -8px rgba(0, 0, 0, 0.15),
+    0 0 0 1px var(--ink-border);
+}
+
+/* Card Header */
+.card-mat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.card-index-tag {
+  color: var(--swiss-red);
+}
+
+.card-reg-mark {
+  color: var(--ink-dim);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.card-optic-tag {
+  color: var(--ink-secondary);
+}
+
+/* Rectangular Photo Window */
+.card-photo-window {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 3.8;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.card-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.photo-card-item:hover .card-photo-img {
+  transform: scale(1.04);
+}
+
+/* Hover prompt */
+.card-hover-prompt {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(17, 18, 21, 0.75);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  font-weight: 600;
+  padding: 0.5rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: var(--transition-fast);
+}
+
+.photo-card-item.active:hover .card-hover-prompt {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Card Mat Footer */
+.card-mat-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: var(--ink-dim);
+  font-weight: 600;
+  border-top: 1px solid var(--ink-hairline);
+}
+
+/* Card Ambient Floor Shadow */
+.card-floor-shadow {
+  width: 220px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.22) 0%, transparent 70%);
+  margin-top: 1.5rem;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.photo-card-item.active .card-floor-shadow {
+  transform: scale(1.35);
+  opacity: 0.75;
+}
+
+.card-sub-identifier {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: var(--ink-dim);
+  transition: color 0.3s ease;
+}
+
+.photo-card-item.active .card-sub-identifier {
+  color: var(--ink-primary);
+  font-weight: 700;
+}
+
+.sub-num {
+  color: var(--swiss-red);
+  font-weight: 700;
+}
+
+/* Stepper & Drag Hint */
+.stage-nav-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.stepper-arrow {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-hairline);
+  background: var(--bg-surface);
+  color: var(--ink-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.stepper-arrow:hover {
+  background: var(--ink-primary);
+  color: var(--bg-canvas);
+  border-color: var(--ink-primary);
+}
+
+.drag-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+.drag-bullet {
+  width: 6px;
+  height: 6px;
+  background: var(--swiss-red);
+  border-radius: 50%;
+}
+
+/* --------------------------------------------------------------------------
+   6. SWISS EDITORIAL LINER NOTES & SPECIFICATIONS
+   -------------------------------------------------------------------------- */
+.editorial-liner-deck {
+  padding: 0 3rem;
+  margin-top: 1rem;
+}
+
+.liner-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+/* Column A: Title & Critical Visual Analysis */
+.meta-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.swiss-red-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--swiss-red);
+  padding: 0.2rem 0.65rem;
+  border-radius: 3px;
+}
+
+.liner-genre {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+.liner-title {
+  font-family: var(--font-swiss);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 1.5rem;
+  transition: opacity 0.3s ease;
+}
+
+.liner-critique-block {
+  border-left: 3px solid var(--swiss-red);
+  padding-left: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.critique-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.critique-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+
+.critique-clo {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  background: var(--bg-card-subtle);
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  color: var(--ink-secondary);
+  font-weight: 600;
+}
+
+.liner-critique-text {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  font-weight: 400;
+  transition: opacity 0.3s ease;
+}
+
+.liner-actions {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.btn-takeover {
+  background: var(--ink-primary);
+  color: var(--bg-canvas);
+  border: 1px solid var(--ink-primary);
+  padding: 0.85rem 1.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: var(--transition-fast);
+}
+
+.btn-takeover:hover {
+  background: var(--swiss-red);
+  border-color: var(--swiss-red);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-secondary-link {
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  color: var(--ink-primary);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.85rem 0.5rem;
+  transition: var(--transition-fast);
+}
+
+.btn-secondary-link:hover {
+  color: var(--swiss-red);
+}
+
+/* Column B: Camera Parameters Table */
+.specs-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--ink-hairline);
+  padding: 1.75rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.specs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.85rem;
+  border-bottom: 2px solid var(--ink-primary);
+  margin-bottom: 0.75rem;
+}
+
+.specs-card-title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+}
+
+.specs-card-sub {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+.specs-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 1.3fr;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--ink-hairline);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.spec-row:last-child {
+  border-bottom: none;
+}
+
+.spec-num {
+  color: var(--swiss-red);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.spec-name {
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.spec-val {
+  color: var(--ink-primary);
+  font-weight: 700;
+  text-align: right;
+}
+
+.specs-footer {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--ink-dim);
+  padding-top: 1rem;
+  border-top: 1px solid var(--ink-hairline);
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   7. VIEW 2: CONTACT SHEET
+   -------------------------------------------------------------------------- */
+.sheet-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.sheet-header {
+  margin-bottom: 3rem;
+  max-width: 700px;
+}
+
+.sheet-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  color: var(--swiss-red);
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.sheet-title {
+  font-family: var(--font-swiss);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.sheet-desc {
+  font-size: 1.05rem;
+  color: var(--ink-secondary);
+  line-height: 1.6;
+}
+
+.sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.sheet-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--ink-border);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.sheet-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px -10px rgba(0, 0, 0, 0.14);
+}
+
+.sheet-media {
+  position: relative;
+  aspect-ratio: 3 / 3.8;
+  background: #000;
+  overflow: hidden;
+}
+
+.sheet-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.sheet-card:hover .sheet-img {
+  transform: scale(1.05);
+}
+
+.sheet-index {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: var(--swiss-red);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 3px;
+}
+
+.sheet-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 18, 21, 0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sheet-card:hover .sheet-hover-overlay {
+  opacity: 1;
+}
+
+.sheet-card-info {
+  padding: 1.5rem;
+}
+
+.sheet-element-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  color: var(--swiss-red);
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+
+.sheet-item-title {
+  font-family: var(--font-swiss);
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.3px;
+}
+
+.sheet-item-excerpt {
+  font-size: 0.92rem;
+  color: var(--ink-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.sheet-specs-mini {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--ink-hairline);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   8. VIEW 3: INSTAGRAM SUBMISSION
+   -------------------------------------------------------------------------- */
+.ig-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.ig-intro {
+  margin-bottom: 2.5rem;
+  max-width: 680px;
+}
+
+.ig-layout-split {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: 3.5rem;
+  align-items: start;
+}
+
+.ig-phone-frame {
+  background: var(--bg-surface);
+  border: 1px solid var(--ink-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+}
+
+.ig-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--ink-hairline);
+}
+
+.ig-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ig-avatar-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(45deg, #f09433, #dc2743, #cc2366);
+}
+
+.ig-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #000;
+}
+
+.ig-handle {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.ig-geo {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+}
+
+.ig-media-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #000;
+}
+
+.ig-main-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ig-hero-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--swiss-red);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 3px;
+}
+
+.ig-interactions {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem 0.25rem;
+  font-size: 1.25rem;
+}
+
+.ig-action-icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.ig-caption-block {
+  padding: 0.5rem 1rem 1.25rem;
+}
+
+.ig-likes-line {
+  font-size: 0.82rem;
+  margin-bottom: 0.5rem;
+}
+
+.ig-body-text {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin-bottom: 0.85rem;
+}
+
+.ig-tags-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.ig-tag {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--swiss-red);
+  font-weight: 700;
+}
+
+.btn-copy-ig {
+  width: 100%;
+  background: var(--ink-primary);
+  color: var(--bg-canvas);
+  border: none;
+  padding: 0.85rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-copy-ig:hover {
+  background: var(--swiss-red);
+  color: #fff;
+}
+
+.copy-feedback {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #22c55e;
+  text-align: center;
+  margin-top: 0.5rem;
+  min-height: 1.2rem;
+}
+
+/* Guide Panel */
+.ig-guide-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Instagram QR Card */
+.ig-qr-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--ink-border);
+  padding: 1.75rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.ig-qr-frame {
+  width: 130px;
+  height: 130px;
+  background: #ffffff;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--ink-hairline);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ig-qr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.ig-qr-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.qr-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 1.5px;
+  color: var(--swiss-red);
+  font-weight: 800;
+}
+
+.qr-handle {
+  font-family: var(--font-swiss);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.qr-subtext {
+  font-size: 0.85rem;
+  color: var(--ink-secondary);
+  line-height: 1.4;
+  margin-bottom: 0.4rem;
+}
+
+.btn-visit-ig {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--ink-primary);
+  color: var(--bg-canvas);
+  border: 1px solid var(--ink-primary);
+  padding: 0.65rem 1.1rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.btn-visit-ig:hover {
+  background: var(--swiss-red);
+  border-color: var(--swiss-red);
+  color: #fff;
+}
+
+.guide-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--ink-hairline);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.guide-title {
+  font-family: var(--font-swiss);
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.guide-note {
+  font-size: 0.95rem;
+  color: var(--ink-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.hero-selector-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.hero-select-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--ink-hairline);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.hero-select-btn.active {
+  background: var(--ink-primary);
+  color: var(--bg-canvas);
+  border-color: var(--ink-primary);
+  font-weight: 700;
+}
+
+.check-mark {
+  font-size: 0.75rem;
+  color: var(--swiss-red);
+}
+
+.hero-select-btn.active .check-mark {
+  color: #fff;
+}
+
+.submission-checklist h4 {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  margin-bottom: 0.85rem;
+  font-weight: 800;
+}
+
+.submission-checklist ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--ink-secondary);
+}
+
+.submission-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.chk {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   9. VIEW 4: CURATOR & ACADEMIC BRIEF
+   -------------------------------------------------------------------------- */
+.curator-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.curator-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+}
+
+.curator-bio-card, .curator-brief-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--ink-hairline);
+  border-radius: 8px;
+  padding: 2.5rem;
+}
+
+.bio-portrait-area {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.bio-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--ink-border);
+}
+
+.artist-status-pill {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 4px;
+  border: 1px solid var(--ink-hairline);
+  background: var(--bg-card-subtle);
+  font-weight: 700;
+}
+
+.artist-name {
+  font-family: var(--font-swiss);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0.25rem 0;
+}
+
+.artist-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  margin-bottom: 1.25rem;
+}
+
+.artist-statement {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+}
+
+.brief-title {
+  font-family: var(--font-swiss);
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 1.5rem;
+}
+
+.brief-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.brief-row {
+  display: flex;
+  flex-direction: column;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--ink-hairline);
+}
+
+.brief-row:last-child {
+  border-bottom: none;
+}
+
+.b-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  color: var(--ink-dim);
+  margin-bottom: 0.2rem;
+  font-weight: 700;
+}
+
+.b-val {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.code-val {
+  font-family: var(--font-mono);
+  color: var(--swiss-red);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   10. IMMERSIVE FULL-BLEED TAKEOVER
+   -------------------------------------------------------------------------- */
+.takeover-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-a24);
+}
+
+.takeover-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+.takeover-backdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.takeover-media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.6s var(--ease-a24);
+}
+
+.takeover-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+  pointer-events: none;
+}
+
+.takeover-close-btn {
+  position: absolute;
+  top: 2rem;
+  right: 2.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  padding: 0.6rem 1.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1010;
+  transition: var(--transition-fast);
+}
+
+.takeover-close-btn:hover {
+  background: var(--swiss-red);
+  border-color: var(--swiss-red);
+  color: #fff;
+}
+
+.takeover-editorial-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3rem 4rem;
+  color: #fff;
+}
+
+.hud-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hud-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: var(--swiss-red);
+  font-weight: 800;
+}
+
+.hud-cat {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  opacity: 0.7;
+}
+
+.hud-bottom {
+  max-width: 800px;
+}
+
+.hud-title {
+  font-family: var(--font-swiss);
+  font-size: clamp(2rem, 4.5vw, 3.8rem);
+  font-weight: 800;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.hud-critique {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.hud-specs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  opacity: 0.8;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   11. Swiss Bottom Dock
+   -------------------------------------------------------------------------- */
+.swiss-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  z-index: 100;
+  border-top: 1px solid var(--ink-hairline);
+  background: var(--bg-dock);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.dock-note {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+.index-steppers {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.index-num-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  transition: var(--transition-fast);
+}
+
+.index-num-btn:hover {
+  color: var(--ink-primary);
+}
+
+.index-num-btn.active {
+  color: var(--swiss-red);
+  font-weight: 800;
+}
+
+.index-sep {
+  color: var(--ink-hairline);
+}
+
+.dock-hashtags {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  color: var(--swiss-red);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   12. Responsive Breakpoints
+   -------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .swiss-header, .swiss-dock {
+    padding: 0 1.25rem;
+  }
+  .stage-eyebrow, .editorial-liner-deck {
+    padding: 0 1.25rem;
+  }
+  .liner-container {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .ig-layout-split {
+    grid-template-columns: 1fr;
+  }
+  .curator-grid {
+    grid-template-columns: 1fr;
+  }
+  .takeover-editorial-hud {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .header-nav {
+    display: none;
+  }
+  .live-clock {
+    display: none;
+  }
+  .crate-track {
+    gap: 2.5rem;
+  }
+  .photo-card-item {
+    width: 250px;
+    height: 340px;
+  }
+  .photo-card-item.active {
+    transform: scale(1.08);
+  }
+  .dock-left, .dock-right {
+    display: none;
+  }
+  .swiss-dock {
+    justify-content: center;
+  }
+}
+
+/* ======================================================
+   INSTAGRAM VIEW — CENTERED QR BLOCK (New Clean Layout)
+   ====================================================== */
+.ig-centered-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 480px;
+  margin: 2rem auto 0;
+  text-align: center;
+}
+
+.ig-qr-frame-link {
+  display: block;
+  background: #fff;
+  padding: 1.5rem;
+  border: 1px solid var(--ink-hairline);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  transition: var(--transition-fast);
+  border-radius: 2px;
+}
+
+.ig-qr-frame-link:hover {
+  box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+  transform: translateY(-3px);
+}
+
+.ig-qr-large {
+  width: 260px;
+  height: 260px;
+  object-fit: contain;
+  display: block;
+}
+
+.ig-profile-handle {
+  font-family: var(--font-swiss);
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.ig-profile-note {
+  font-size: 0.9rem;
+  color: var(--ink-secondary);
+  margin: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.ig-hashtag-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ink-hairline);
+  width: 100%;
+}
+
+.ig-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  padding: 2rem 1rem;
+}

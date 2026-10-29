@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgLine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18191d"/>
+      <stop offset="100%" stop-color="#24262f"/>
+    </linearGradient>
+    <pattern id="diagLines" width="40" height="40" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="40" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="1000" fill="url(#bgLine)"/>
+  <rect width="800" height="1000" fill="url(#diagLines)"/>
+  
+  <!-- Architectural Leading Lines Graphic -->
+  <path d="M 0 1000 L 400 450 L 800 1000" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <path d="M 100 1000 L 400 450 L 700 1000" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <line x1="400" y1="450" x2="400" y2="0" stroke="#e63946" stroke-width="2" stroke-dasharray="4 4"/>
+  <circle cx="400" cy="450" r="8" fill="#e63946"/>
+  
+  <!-- Swiss Framing Marks -->
+  <path d="M 40 80 L 40 40 L 80 40" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+  <path d="M 720 40 L 760 40 L 760 80" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+  <path d="M 40 920 L 40 960 L 80 960" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+  <path d="M 720 960 L 760 960 L 760 920" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+  
+  <!-- Typography inside image -->
+  <text x="400" y="240" fill="#e63946" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="16" font-weight="700" letter-spacing="4" text-anchor="middle">STUDY 01 / 03</text>
+  <text x="400" y="290" fill="#ffffff" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="42" font-weight="800" letter-spacing="-1" text-anchor="middle">ELEMENT : LINE</text>
+  <text x="400" y="330" fill="rgba(255,255,255,0.6)" font-family="'Space Grotesk', monospace" font-size="16" letter-spacing="1" text-anchor="middle">PERSPECTIVE · DIRECTION · TENSION</text>
+  
+  <text x="400" y="850" fill="rgba(255,255,255,0.5)" font-family="'Space Grotesk', monospace" font-size="14" text-anchor="middle">DROP YOUR PHOTO IN:</text>
+  <text x="400" y="880" fill="#e63946" font-family="'Space Grotesk', monospace" font-size="15" font-weight="600" text-anchor="middle">assets/images/elements/element-1/</text>
+</svg>

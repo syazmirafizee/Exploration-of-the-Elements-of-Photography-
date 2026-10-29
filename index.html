@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GKU 1033 | Exploration of Elements — Swiss Photography Portfolio</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/icons/favicon.svg">
+  
+  <!-- Swiss Modern Typography: Inter + Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- FIXES -->
+  <style>
+    /* 1. Prevents hidden views from taking up scrollable space */
+    .main-viewport {
+      position: relative;
+      width: 100%;
+    }
+    
+    .view-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .view-panel.active {
+      position: relative;
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* 2. Constrain the red SVG frame securely to the white card itself */
+    .swiss-mount-card {
+      position: relative !important;
+    }
+    
+    .hand-drawn-frame {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      transform: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      z-index: 10 !important;
+      pointer-events: none !important;
+    }
+  </style>
+</head>
+<body class="theme-canvas">
+
+  <!-- Subtle Film Grain -->
+  <div class="film-grain" aria-hidden="true"></div>
+
+  <!-- Interactive Drag Indicator Cursor -->
+  <div id="cursorFollower" class="custom-cursor" aria-hidden="true">
+    <span class="cursor-label">DRAG</span>
+  </div>
+
+  <!-- Swiss Header Navigation -->
+  <header class="swiss-header">
+    <div class="header-left">
+      <a href="#" class="brand-monogram">
+        <span class="swiss-square"></span>
+        <span class="brand-title">GKU 1033</span>
+        <span class="brand-divider">/</span>
+        <span class="brand-sub">UNIMAS · FACA</span>
+      </a>
+    </div>
+
+    <!-- Center Navigation Mode Tabs -->
+    <nav class="header-nav">
+      <button class="nav-pill active" data-view="crate" onclick="switchView('crate')">
+        <span class="pill-dot"></span> Gallery Slider
+      </button>
+      <button class="nav-pill" data-view="instagram" onclick="switchView('instagram')">
+        Instagram
+      </button>
+    </nav>
+
+    <!-- Header Right Controls -->
+    <div class="header-right">
+      <div class="live-clock" id="liveClock" title="Local Time in Sarawak, Malaysia">
+        KUCHING, MY <span class="clock-digits">00:00:00</span>
+      </div>
+      <button class="icon-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Switch Light / Darkroom Noir">
+        <span id="themeIcon">◐</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="main-viewport">
+
+    <!-- ====================================================================
+         VIEW 1: SWISS PHOTOGRAPHIC CARD SLIDER (Primary Crate View)
+         ==================================================================== -->
+    <section id="crateView" class="view-panel active">
+      
+      <!-- Top Stage Eyebrow (Technical Classification) -->
+      <div class="stage-eyebrow">
+        <div class="eyebrow-item">
+          <!-- UPDATED NAME AND MATRIC NUMBER -->
+          <span class="mono-label">Muhamad Syazmi Rafizee Bin Rasid (84630)</span>
+          <span class="mono-val" id="catalogRef">84630</span>
+        </div>
+        <div class="eyebrow-item center-align">
+          <span class="stage-tag" id="elementTag">STUDY 01 OF 03</span>
+        </div>
+        <div class="eyebrow-item right-align">
+          <span class="mono-label">DISCIPLINE</span>
+          <span class="mono-val">FINE ARTS PHOTOGRAPHY</span>
+        </div>
+      </div>
+
+      <!-- HORIZONTAL INTERACTIVE CARD STAGE -->
+      <div class="crate-stage-wrapper" id="crateWrapper">
+        <div class="crate-track" id="crateTrack">
+
+          <!-- SWISS CARD 01: LINE -->
+          <div class="photo-card-item active" data-index="0" onclick="selectLens(0)">
+            <div class="card-outer-wrapper">
+              
+              <!-- Swiss Card Body (Museum Mat Mount) -->
+              <div class="swiss-mount-card">
+                
+                <!-- Hand-Drawn Selection Accent MOVED INSIDE -->
+                <svg class="hand-drawn-frame" viewBox="0 0 340 440" preserveAspectRatio="none" aria-hidden="true">
+                  <rect x="6" y="6" width="328" height="428" rx="8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="14 18 360 20" stroke-linecap="round"/>
+                  <rect x="3" y="3" width="334" height="434" rx="10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="80 40 240 30" stroke-opacity="0.6"/>
+                </svg>
+
+                <!-- Card Header Details -->
+                <div class="card-mat-header">
+                  <span class="card-index-tag">01 / LINE</span>
+                  <div class="card-reg-mark">+</div>
+                  <span class="card-optic-tag">1.54mm · f/2.4</span>
+                </div>
+
+                <!-- Rectangular Photo Frame -->
+                <div class="card-photo-window">
+                  <img id="opticImg0" src="assets/images/elements/element-1/lines-in-perspective.jpg" alt="Lines in Perspective - Element 01: Line" class="card-photo-img">
+                  <div class="card-hover-prompt">Click to Inspect Full Frame ↗</div>
+                </div>
+
+                <!-- Card Footer Stamp -->
+                <div class="card-mat-footer">
+                  <span class="mat-series-name">VISUAL COMMUNICATION</span>
+                  <span class="mat-univ-stamp">UNIMAS · FACA</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Floor Shadow -->
+            <div class="card-floor-shadow"></div>
+            
+            <div class="card-sub-identifier">
+              <span class="sub-num">01</span>
+              <span class="sub-name">ELEMENT : LINE</span>
+            </div>
+          </div>
+
+          <!-- SWISS CARD 02: TEXTURE -->
+          <div class="photo-card-item" data-index="1" onclick="selectLens(1)">
+            <div class="card-outer-wrapper">
+              <div class="swiss-mount-card">
+                
+                <!-- Hand-Drawn Selection Accent MOVED INSIDE -->
+                <svg class="hand-drawn-frame" viewBox="0 0 340 440" preserveAspectRatio="none" aria-hidden="true">
+                  <rect x="6" y="6" width="328" height="428" rx="8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="14 18 360 20" stroke-linecap="round"/>
+                  <rect x="3" y="3" width="334" height="434" rx="10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="80 40 240 30" stroke-opacity="0.6"/>
+                </svg>
+
+                <div class="card-mat-header">
+                  <span class="card-index-tag">02 / TEXTURE</span>
+                  <div class="card-reg-mark">+</div>
+                  <span class="card-optic-tag">5.7mm · f/1.5</span>
+                </div>
+
+                <div class="card-photo-window">
+                  <img id="opticImg1" src="assets/images/elements/element-2/beauty-in-texture.jpg" alt="Beauty in Texture - Element 02: Texture" class="card-photo-img">
+                  <div class="card-hover-prompt">Click to Inspect Full Frame ↗</div>
+                </div>
+
+                <div class="card-mat-footer">
+                  <span class="mat-series-name">VISUAL COMMUNICATION</span>
+                  <span class="mat-univ-stamp">UNIMAS · FACA</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-floor-shadow"></div>
+            
+            <div class="card-sub-identifier">
+              <span class="sub-num">02</span>
+              <span class="sub-name">ELEMENT : TEXTURE</span>
+            </div>
+          </div>
+
+          <!-- SWISS CARD 03: VALUE -->
+          <div class="photo-card-item" data-index="2" onclick="selectLens(2)">
+            <div class="card-outer-wrapper">
+              <div class="swiss-mount-card">
+
+                <!-- Hand-Drawn Selection Accent MOVED INSIDE -->
+                <svg class="hand-drawn-frame" viewBox="0 0 340 440" preserveAspectRatio="none" aria-hidden="true">
+                  <rect x="6" y="6" width="328" height="428" rx="8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="14 18 360 20" stroke-linecap="round"/>
+                  <rect x="3" y="3" width="334" height="434" rx="10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="80 40 240 30" stroke-opacity="0.6"/>
+                </svg>
+
+                <div class="card-mat-header">
+                  <span class="card-index-tag">03 / SPACE</span>
+                  <div class="card-reg-mark">+</div>
+                  <span class="card-optic-tag">1.54mm · f/2.4</span>
+                </div>
+
+                <div class="card-photo-window">
+                  <img id="opticImg2" src="assets/images/elements/element-3/a-space-to-breathe.jpg" alt="A Space to Breathe - Element 03: Space" class="card-photo-img">
+                  <div class="card-hover-prompt">Click to Inspect Full Frame ↗</div>
+                </div>
+
+                <div class="card-mat-footer">
+                  <span class="mat-series-name">VISUAL COMMUNICATION</span>
+                  <span class="mat-univ-stamp">UNIMAS · FACA</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-floor-shadow"></div>
+            
+            <div class="card-sub-identifier">
+              <span class="sub-num">03</span>
+              <span class="sub-name">ELEMENT : SPACE</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Stage Controls & Drag Hint -->
+      <div class="stage-nav-controls">
+        <button class="stepper-arrow prev" onclick="stepLens(-1)" aria-label="Previous Photo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="drag-hint">
+          <span class="drag-bullet"></span>
+          <span class="drag-text">SCROLL WHEEL OR DRAG TO BROWSE</span>
+        </div>
+        <button class="stepper-arrow next" onclick="stepLens(1)" aria-label="Next Photo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- SWISS EDITORIAL LINER NOTES & SPECIFICATIONS -->
+      <div class="editorial-liner-deck">
+        <div class="liner-container">
+          
+          <!-- Column A: Title & Visual Critique -->
+          <div class="liner-main-column">
+            <div class="meta-tag-row">
+              <span class="swiss-red-badge" id="linerElement">ELEMENT 01</span>
+              <span class="liner-genre" id="linerTopic">PERSPECTIVE & GEOMETRY</span>
+            </div>
+
+            <h1 class="liner-title" id="linerTitle">
+              Lines in Perspective
+            </h1>
+
+            <div class="liner-critique-block">
+              <div class="critique-header">
+                <span class="critique-label">VISUAL ANALYSIS (2–3 SENTENCES)</span>
+                <span class="critique-clo">CLO1 · PLO1 ACADEMIC EVALUATION</span>
+              </div>
+              <p class="liner-critique-text" id="linerAnalysis">
+                This photograph explores the element of line through the diagonal railing, vertical window frames and geometric patterns on the floor. These lines guide the viewer's eyes through the composition, creating a sense of depth and structure while the contrast between sunlight and shadows adds visual interest to the architectural space.
+              </p>
+            </div>
+
+            <div class="liner-actions">
+              <button class="btn-takeover" onclick="openFullBleedTakeover()">
+                <span>INSPECT FULL FRAME</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+              </button>
+              <button class="btn-secondary-link" onclick="jumpToInstagram()">
+                <span>VIEW INSTAGRAM ENTRY →</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Column B: Camera Parameters Table -->
+          <div class="liner-specs-column">
+            <div class="specs-card">
+              <div class="specs-header">
+                <span class="specs-card-title">TECHNICAL LINER SPECIFICATIONS</span>
+                <span class="specs-card-sub">EXIF / CAPTURE DATA</span>
+              </div>
+
+              <div class="specs-table">
+                <div class="spec-row">
+                  <span class="spec-num">01</span>
+                  <span class="spec-name">APERTURE</span>
+                  <span class="spec-val" id="specAperture">f/2.4</span>
+                </div>
+                <div class="spec-row">
+                  <span class="spec-num">02</span>
+                  <span class="spec-name">SHUTTER SPEED</span>
+                  <span class="spec-val" id="specShutter">1/320 SEC</span>
+                </div>
+                <div class="spec-row">
+                  <span class="spec-num">03</span>
+                  <span class="spec-name">ISO SENSITIVITY</span>
+                  <span class="spec-val" id="specIso">ISO 32</span>
+                </div>
+                <div class="spec-row">
+                  <span class="spec-num">04</span>
+                  <span class="spec-name">FOCAL LENGTH</span>
+                  <span class="spec-val" id="specFocal">1.54MM (ULTRA WIDE)</span>
+                </div>
+                <div class="spec-row">
+                  <span class="spec-num">05</span>
+                  <span class="spec-name">RECORDING DEVICE</span>
+                  <span class="spec-val" id="specDevice">IPHONE 14</span>
+                </div>
+                <div class="spec-row">
+                  <span class="spec-num">06</span>
+                  <span class="spec-name">LIGHTING CONDITION</span>
+                  <span class="spec-val" id="specLight">NATURAL SUNLIGHT & SHADOWS</span>
+                </div>
+              </div>
+
+              <div class="specs-footer">
+                <span>FINE ARTS PHOTOGRAPHY ARCHIVE</span>
+                <span>SEMESTER 1 · 2026/2027</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         VIEW 2: INSTAGRAM SUBMISSION
+         ==================================================================== -->
+    <section id="instagramView" class="view-panel">
+      <div class="container ig-container">
+
+        <!-- Centered QR + Link ONLY -->
+        <div class="ig-centered-block">
+          <a href="https://www.instagram.com/roughmidnight13/" target="_blank" rel="noopener noreferrer" class="ig-qr-frame-link">
+            <img src="assets/images/icons/instagram-qr.png" alt="Instagram QR Code - @roughmidnight13" class="ig-qr-large">
+          </a>
+          <h3 class="ig-profile-handle">@roughmidnight13</h3>
+          <p class="ig-profile-note">Scan with your phone camera or click to visit on Instagram</p>
+          <a href="https://www.instagram.com/roughmidnight13/" target="_blank" rel="noopener noreferrer" class="btn-visit-ig">
+            VISIT @ROUGHMIDNIGHT13 ON INSTAGRAM &#8599;
+          </a>
+          <div class="ig-hashtag-line">
+            <span class="ig-tag">#SemesterSatu2226</span>
+            <span class="ig-tag">#SatuElement26</span>
+            <span class="ig-tag">#GKU1033</span>
+            <span class="ig-tag">#UNIMAS</span>
+            <span class="ig-tag">#FACA</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================================================================
+       IMMERSIVE FULL-BLEED TAKEOVER (Edge-to-Edge Poster View)
+       ==================================================================== -->
+  <div id="fullBleedModal" class="takeover-overlay" aria-hidden="true">
+    <button class="takeover-close-btn" onclick="closeFullBleedTakeover()" aria-label="Close Full Frame View">
+      <span>✕ CLOSE VIEW</span>
+    </button>
+
+    <div class="takeover-backdrop">
+      <img id="takeoverImg" src="" alt="Full Bleed Photography" class="takeover-media">
+      <div class="takeover-vignette"></div>
+    </div>
+
+    <div class="takeover-editorial-hud">
+      <div class="hud-top">
+        <span class="hud-badge" id="hudElement">ELEMENT 01</span>
+        <span class="hud-cat">GKU 1033 · FINE ARTS UNIMAS</span>
+      </div>
+
+      <div class="hud-bottom">
+        <h2 class="hud-title" id="hudTitle">Photo Title</h2>
+        <p class="hud-critique" id="hudCritique">Analysis text...</p>
+        <div class="hud-specs-bar" id="hudSpecsBar">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Swiss Bottom Navigation Dock -->
+  <footer class="swiss-dock">
+    <div class="dock-left">
+      <span class="dock-note">SEMESTER 1 2026/2027 · UNIMAS FACA</span>
+    </div>
+
+    <!-- Quick Index Selectors 01 02 03 -->
+    <div class="dock-center">
+      <div class="index-steppers">
+        <button class="index-num-btn active" data-idx="0" onclick="selectLens(0)">01</button>
+        <span class="index-sep">/</span>
+        <button class="index-num-btn" data-idx="1" onclick="selectLens(1)">02</button>
+        <span class="index-sep">/</span>
+        <button class="index-num-btn" data-idx="2" onclick="selectLens(2)">03</button>
+      </div>
+    </div>
+
+    <div class="dock-right">
+      <span class="dock-hashtags">#SemesterSatu2226 #SatuElement26</span>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
