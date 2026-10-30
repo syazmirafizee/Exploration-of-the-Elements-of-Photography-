@@ -388,7 +388,10 @@
   </main>
 
   <!-- ====================================================================
-       IMMERSIVE FULL-BLEED TAKEOVER (Edge-to-Edge Poster View)
+       IMMERSIVE FULL-BLEED TAKEOVER (full-frame lightbox)
+       Desktop: description on the left, photo anchored to the right.
+       Phones: photo fills the screen; the description rises over it as a
+       sheet when the visitor scrolls.
        ==================================================================== -->
   <div id="fullBleedModal" class="takeover-overlay" aria-hidden="true">
     <button class="takeover-close-btn" onclick="closeFullBleedTakeover()" aria-label="Close Full Frame View">
@@ -397,10 +400,12 @@
 
     <div class="takeover-backdrop">
       <img id="takeoverImg" src="" alt="Full Bleed Photography" class="takeover-media">
-      <div class="takeover-vignette"></div>
     </div>
 
     <div class="takeover-editorial-hud">
+      <!-- Phones only: the tab that peeks in at the bottom of the photo -->
+      <button type="button" class="hud-sheet-hint"><span>SCROLL FOR DETAILS</span></button>
+
       <div class="hud-top">
         <span class="hud-badge" id="hudElement">ELEMENT 01</span>
         <span class="hud-cat">GKU 1033 · FINE ARTS UNIMAS</span>

@@ -1477,49 +1477,50 @@ html, body {
 /* --------------------------------------------------------------------------
    10. IMMERSIVE FULL-BLEED TAKEOVER
    -------------------------------------------------------------------------- */
+/* Desktop: the description sits on the left and the photo is anchored to the
+   right edge at full height. The text animates in every time the view opens.
+   Phones, portrait screens and short screens use the scrolling layout in the
+   media query at the end of this section. */
 .takeover-overlay {
+  --sheet-progress: 0; /* phones: 0 = details tucked away, 1 = fully risen */
   display: none;
   position: fixed;
   inset: 0;
   z-index: 1000;
   background: #000;
-  opacity: 0;
-  transition: opacity 0.5s var(--ease-a24);
+  color: #fff;
 }
 
 .takeover-overlay.active {
-  display: block;
-  opacity: 1;
+  display: flex;
+  animation: takeoverFade 0.45s var(--ease-a24) both;
 }
 
+/* Photo column (right) */
 .takeover-backdrop {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  order: 2;
+  position: relative;
+  flex: 0 1 auto;
+  height: 100%;
+  max-width: 62%;
 }
 
 .takeover-media {
-  width: 100%;
+  display: block;
   height: 100%;
+  width: auto;
+  max-width: 100%;
   object-fit: contain;
-  transition: transform 0.6s var(--ease-a24);
-}
-
-.takeover-vignette {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
-  pointer-events: none;
+  object-position: right center;
 }
 
 .takeover-close-btn {
   position: absolute;
   top: 2rem;
   right: 2.5rem;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
   font-family: var(--font-mono);
@@ -1539,21 +1540,27 @@ html, body {
   color: #fff;
 }
 
+/* Text column (left) */
 .takeover-editorial-hud {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+  order: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 3rem 4rem;
-  color: #fff;
+  padding: clamp(2rem, 4vw, 4rem);
+  overflow-y: auto; /* very short windows: the text scrolls instead of being cut off */
+}
+
+/* "Scroll for details" tab: phones only */
+.hud-sheet-hint {
+  display: none;
 }
 
 .hud-top {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
 }
 
 .hud-badge {
@@ -1571,36 +1578,282 @@ html, body {
   opacity: 0.7;
 }
 
+/* Title, critique and specs, centred in the space below the badge */
 .hud-bottom {
-  max-width: 800px;
+  max-width: 36rem;
+  margin: auto 0;
+  padding-top: 2rem;
+}
+
+/* Short red rule drawn above the title */
+.hud-bottom::before {
+  content: '';
+  display: block;
+  width: 3rem;
+  height: 3px;
+  margin-bottom: 1.5rem;
+  background: var(--swiss-red);
+  transform-origin: left center;
 }
 
 .hud-title {
   font-family: var(--font-swiss);
-  font-size: clamp(2rem, 4.5vw, 3.8rem);
+  font-size: clamp(2rem, 3.6vw, 3.6rem);
   font-weight: 800;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   line-height: 1.1;
   letter-spacing: -0.5px;
 }
 
 .hud-critique {
-  font-size: 1.2rem;
-  line-height: 1.6;
-  opacity: 0.9;
-  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  opacity: 0.88;
+  margin-bottom: 1.75rem;
 }
 
 .hud-specs-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 0.6rem 1.5rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 1.5px;
   opacity: 0.8;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 1rem;
+}
+
+/* Opening animation: the photo slides in from the right, then the badge,
+   red rule, title, critique and specs rise in one after another. */
+.takeover-overlay.active .takeover-media {
+  animation: takeoverMediaIn 1s var(--ease-a24) 0.1s both;
+}
+.takeover-overlay.active .hud-top {
+  animation: hudRise 0.8s var(--ease-a24) 0.3s both;
+}
+.takeover-overlay.active .hud-bottom::before {
+  animation: hudRule 0.8s var(--ease-a24) 0.4s both;
+}
+.takeover-overlay.active .hud-title {
+  animation: hudRise 0.9s var(--ease-a24) 0.45s both;
+}
+.takeover-overlay.active .hud-critique {
+  animation: hudRise 0.9s var(--ease-a24) 0.6s both;
+}
+.takeover-overlay.active .hud-specs-bar {
+  animation: hudRise 0.9s var(--ease-a24) 0.75s both;
+}
+
+@keyframes takeoverFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes takeoverMediaIn {
+  from { opacity: 0; transform: translateX(3rem); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes takeoverZoomIn {
+  from { opacity: 0; transform: scale(1.04); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes hudRise {
+  from { opacity: 0; transform: translateY(1.75rem); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes hudRule {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes sheetPeek {
+  from { transform: translateY(4.5rem); }
+  to { transform: none; }
+}
+
+@keyframes hintNudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Phones, portrait tablets and short landscape screens: the photo fills the
+   screen. The description waits in a sheet below it, with only a
+   "Scroll for details" tab showing, and rises over the photo as the visitor
+   scrolls. JS sets --sheet-progress and .sheet-open from the scroll. */
+@media (max-width: 680px), (orientation: portrait), (max-height: 500px) {
+  .takeover-overlay.active {
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .takeover-backdrop {
+    position: sticky;
+    top: 0;
+    height: 100%;
+    max-width: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .takeover-media {
+    width: 100%;
+    max-width: none;
+    object-position: center;
+  }
+
+  .takeover-overlay.active .takeover-media {
+    animation: takeoverZoomIn 0.9s var(--ease-a24) both;
+  }
+
+  /* Dims the photo as the sheet rises, so the text stays easy to read */
+  .takeover-backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: calc(var(--sheet-progress) * 0.45);
+    pointer-events: none;
+  }
+
+  .takeover-close-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.68rem;
+  }
+
+  /* The sheet. Its top 4.5rem (the tab) peeks in at the bottom of the screen. */
+  .takeover-editorial-hud {
+    position: relative;
+    z-index: 1;
+    display: block;
+    overflow: visible;
+    margin-top: -4.5rem;
+    padding: 0 1.5rem 2.5rem;
+    background: rgba(12, 12, 12, 0.72);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    backdrop-filter: blur(18px) saturate(1.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px 14px 0 0;
+  }
+
+  .takeover-overlay.active .takeover-editorial-hud {
+    animation: sheetPeek 0.7s var(--ease-a24) 0.35s both;
+  }
+
+  .hud-sheet-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    width: 100%;
+    height: 4.5rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* The words fade as the sheet rises; the grab handle stays */
+  .hud-sheet-hint span {
+    opacity: calc(1 - var(--sheet-progress) * 3);
+  }
+
+  /* Grab handle */
+  .hud-sheet-hint::before {
+    content: '';
+    width: 2.25rem;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.45);
+  }
+
+  .takeover-overlay.active .hud-sheet-hint::before {
+    animation: hintNudge 1.6s ease-in-out 1.2s infinite;
+  }
+
+  .hud-top {
+    margin-bottom: 1.5rem;
+  }
+
+  .hud-bottom {
+    max-width: none;
+    margin: 0;
+    padding-top: 0;
+  }
+
+  .hud-title {
+    font-size: clamp(1.9rem, 8.5vw, 2.6rem);
+  }
+
+  .hud-critique {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .hud-specs-bar {
+    gap: 0.6rem 1.25rem;
+    font-size: 0.68rem;
+  }
+
+  /* The text waits out of sight, then rises in as the sheet comes up */
+  .takeover-overlay.active .hud-top,
+  .takeover-overlay.active .hud-title,
+  .takeover-overlay.active .hud-critique,
+  .takeover-overlay.active .hud-specs-bar {
+    animation: none;
+    opacity: 0;
+    transform: translateY(1.5rem);
+    transition: opacity 0.6s var(--ease-a24), transform 0.8s var(--ease-a24);
+  }
+
+  .takeover-overlay.active .hud-bottom::before {
+    animation: none;
+    transform: scaleX(0);
+    transition: transform 0.8s var(--ease-a24);
+  }
+
+  .takeover-overlay.sheet-open .hud-top,
+  .takeover-overlay.sheet-open .hud-title,
+  .takeover-overlay.sheet-open .hud-critique,
+  .takeover-overlay.sheet-open .hud-specs-bar {
+    opacity: 1;
+    transform: none;
+  }
+
+  .takeover-overlay.sheet-open .hud-bottom::before {
+    transform: scaleX(1);
+    transition-delay: 0.1s;
+  }
+  .takeover-overlay.sheet-open .hud-title { transition-delay: 0.12s; }
+  .takeover-overlay.sheet-open .hud-critique { transition-delay: 0.24s; }
+  .takeover-overlay.sheet-open .hud-specs-bar { transition-delay: 0.36s; }
+}
+
+/* Visitors who ask for less motion get the same views without the movement */
+@media (prefers-reduced-motion: reduce) {
+  .takeover-overlay.active,
+  .takeover-overlay.active *,
+  .takeover-overlay.active *::before {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -1689,9 +1942,6 @@ html, body {
   }
   .curator-grid {
     grid-template-columns: 1fr;
-  }
-  .takeover-editorial-hud {
-    padding: 2rem;
   }
 }
 

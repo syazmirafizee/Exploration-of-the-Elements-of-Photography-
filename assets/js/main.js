@@ -299,15 +299,56 @@ function openFullBleedTakeover() {
     <span>DEVICE: ${data.device}</span>
   `;
 
+  // Phones: start with the photo in full view and the details tucked away
+  modal.classList.remove('sheet-open');
+  modal.style.setProperty('--sheet-progress', '0');
+
   modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+  modal.scrollTop = 0;
   document.body.style.overflow = 'hidden';
 }
 
 function closeFullBleedTakeover() {
   playShutterSound();
   const modal = document.getElementById('fullBleedModal');
-  modal.classList.remove('active');
+  modal.classList.remove('active', 'sheet-open');
+  modal.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
+}
+
+// Phones and portrait screens: the full-frame view scrolls, and the details
+// sheet rises over the photo. Scrolling sets --sheet-progress (0 to 1), which
+// dims the photo and fades the words on the "Scroll for details" tab, and
+// adds .sheet-open once, which makes the text rise in. On desktop the view does not scroll,
+// so none of this runs.
+function setupTakeoverSheet() {
+  const modal = document.getElementById('fullBleedModal');
+  if (!modal) return;
+  let ticking = false;
+
+  const update = () => {
+    ticking = false;
+    const maxScroll = modal.scrollHeight - modal.clientHeight;
+    const progress = maxScroll > 0 ? Math.min(1, modal.scrollTop / maxScroll) : 0;
+    modal.style.setProperty('--sheet-progress', progress.toFixed(3));
+    if (modal.scrollTop > 16) modal.classList.add('sheet-open');
+  };
+
+  modal.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }, { passive: true });
+
+  // Tapping the tab brings the whole sheet up
+  const hint = modal.querySelector('.hud-sheet-hint');
+  if (hint) {
+    hint.addEventListener('click', () => {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      modal.scrollTo({ top: modal.scrollHeight, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -431,6 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLiveClock();
   initCustomCursor();
   setupCrateGestures();
+  setupTakeoverSheet();
   updateStagePosition();
 });
 
