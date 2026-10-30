@@ -72,15 +72,18 @@ function playShutterSound() {}
 // --------------------------------------------------------------------------
 function updateStagePosition() {
   const track = document.getElementById('crateTrack');
+  const wrapper = document.getElementById('crateWrapper');
   const items = document.querySelectorAll('.photo-card-item');
   const indexBtns = document.querySelectorAll('.index-num-btn');
-  const stageWidth = document.getElementById('crateWrapper').offsetWidth;
+  const activeItem = items[currentIndex];
 
-  // Spacing between cards based on screen size (card width + gap)
-  const itemGap = window.innerWidth < 680 ? 290 : 398;
-  // Center the active card exactly in the middle of track
-  const offset = -(currentIndex * itemGap);
-  track.style.transform = `translateX(${offset}px)`;
+  // Center the active card in the middle of the stage at every screen size.
+  // offsetLeft/offsetWidth are measured from the real layout (they ignore the
+  // scale transform), so this stays correct if card sizes or gaps change in CSS.
+  if (activeItem) {
+    const offset = wrapper.clientWidth / 2 - (activeItem.offsetLeft + activeItem.offsetWidth / 2);
+    track.style.transform = `translateX(${offset}px)`;
+  }
 
   // Update classes
   items.forEach((item, idx) => {

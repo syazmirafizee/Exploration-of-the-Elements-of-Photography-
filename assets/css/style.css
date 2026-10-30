@@ -354,7 +354,7 @@ html, body {
   height: 560px; /* room for the 112% active card + its shadow and label */
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* track starts at the left; JS centers the active card */
   overflow: hidden;
   user-select: none;
   touch-action: pan-y;
@@ -1673,11 +1673,60 @@ html, body {
 }
 
 @media (max-width: 680px) {
+  /* Two-row header so every desktop item stays visible on phones:
+     row 1 = brand + theme toggle, row 2 = view tabs + Kuching clock */
+  .swiss-header {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+    padding: 0.7rem 1rem;
+  }
+  .header-right {
+    display: contents;
+  }
+  .header-left {
+    order: 1;
+  }
+  .icon-toggle-btn {
+    order: 2;
+    margin-left: auto;
+  }
   .header-nav {
-    display: none;
+    order: 3;
+  }
+  .nav-pill {
+    padding: 0.45rem 0.8rem;
   }
   .live-clock {
-    display: none;
+    order: 4;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.62rem;
+    line-height: 1.25;
+  }
+  .main-viewport {
+    padding-top: 112px; /* matches the taller two-row header (~111px) */
+  }
+  /* Eyebrow: name + catalogue ref on the first line, element tag and
+     discipline side by side underneath */
+  .stage-eyebrow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 0.75rem;
+    row-gap: 0.75rem;
+    align-items: center;
+    padding: 0 1rem;
+  }
+  .stage-eyebrow .eyebrow-item:first-child {
+    grid-column: 1 / -1;
+  }
+  .eyebrow-item.center-align {
+    align-items: flex-start;
+  }
+  .stage-tag {
+    white-space: nowrap;
   }
   .crate-stage-wrapper {
     height: 480px;
