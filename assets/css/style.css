@@ -1514,41 +1514,48 @@ html, body {
   object-position: right center;
 }
 
-.takeover-close-btn {
-  position: absolute;
-  top: 2rem;
-  right: 2.5rem;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 2px;
-  font-weight: 700;
-  padding: 0.6rem 1.4rem;
-  border-radius: 4px;
-  cursor: pointer;
-  z-index: 1010;
-  transition: var(--transition-fast);
-}
-
-.takeover-close-btn:hover {
-  background: var(--swiss-red);
-  border-color: var(--swiss-red);
-  color: #fff;
-}
-
-/* Text column (left) */
+/* Text column (left). A grid: the element-name row with the close button at
+   its end, then the title, critique and specs centred in the space below. */
 .takeover-editorial-hud {
   order: 1;
   flex: 1 1 0;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr;
+  align-items: center;
+  column-gap: 1.5rem;
   padding: clamp(2rem, 4vw, 4rem);
   overflow-y: auto; /* very short windows: the text scrolls instead of being cut off */
+}
+
+/* Close button: at the end of the element-name row, on the black panel
+   instead of on the photo. Phones turn it into a round button on the tab. */
+.takeover-close-btn {
+  grid-column: 2;
+  grid-row: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  padding: 0.55rem 1.1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.takeover-close-btn:hover,
+.takeover-close-btn:focus-visible {
+  background: var(--swiss-red);
+  border-color: var(--swiss-red);
+  color: #fff;
 }
 
 /* "Scroll for details" tab: phones only */
@@ -1557,6 +1564,8 @@ html, body {
 }
 
 .hud-top {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -1578,10 +1587,12 @@ html, body {
   opacity: 0.7;
 }
 
-/* Title, critique and specs, centred in the space below the badge */
+/* Title, critique and specs, centred in the space below the name row */
 .hud-bottom {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  align-self: center;
   max-width: 36rem;
-  margin: auto 0;
   padding-top: 2rem;
 }
 
@@ -1624,12 +1635,14 @@ html, body {
   padding-top: 1rem;
 }
 
-/* Opening animation: the photo slides in from the right, then the badge,
-   red rule, title, critique and specs rise in one after another. */
+/* Opening animation: the photo slides in from the right, then the name row
+   (with the close button), red rule, title, critique and specs rise in one
+   after another. */
 .takeover-overlay.active .takeover-media {
   animation: takeoverMediaIn 1s var(--ease-a24) 0.1s both;
 }
-.takeover-overlay.active .hud-top {
+.takeover-overlay.active .hud-top,
+.takeover-overlay.active .takeover-close-btn {
   animation: hudRise 0.8s var(--ease-a24) 0.3s both;
 }
 .takeover-overlay.active .hud-bottom::before {
@@ -1721,12 +1734,29 @@ html, body {
     pointer-events: none;
   }
 
+  /* Close: a round button on the right end of the "Scroll for details" tab,
+     within thumb reach. It rides up with the sheet, so it stays in view
+     while the visitor reads. */
   .takeover-close-btn {
-    position: fixed;
-    top: 1rem;
+    position: absolute;
+    top: 0.875rem;
     right: 1rem;
-    padding: 0.5rem 1rem;
-    font-size: 0.68rem;
+    z-index: 2;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 0.9rem;
+    letter-spacing: 0;
+  }
+
+  .takeover-close-btn .close-label {
+    display: none;
+  }
+
+  .takeover-overlay.active .takeover-close-btn {
+    animation: none;
   }
 
   /* The sheet. Its top 4.5rem (the tab) peeks in at the bottom of the screen. */

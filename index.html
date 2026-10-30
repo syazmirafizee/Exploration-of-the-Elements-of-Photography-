@@ -394,15 +394,18 @@
        sheet when the visitor scrolls.
        ==================================================================== -->
   <div id="fullBleedModal" class="takeover-overlay" aria-hidden="true">
-    <button class="takeover-close-btn" onclick="closeFullBleedTakeover()" aria-label="Close Full Frame View">
-      <span>✕ CLOSE VIEW</span>
-    </button>
-
     <div class="takeover-backdrop">
       <img id="takeoverImg" src="" alt="Full Bleed Photography" class="takeover-media">
     </div>
 
     <div class="takeover-editorial-hud">
+      <!-- Close: at the end of the element-name row on desktop; a round
+           button on the right of the "Scroll for details" tab on phones -->
+      <button type="button" class="takeover-close-btn" onclick="closeFullBleedTakeover()" aria-label="Close Full Frame View">
+        <span class="close-label">CLOSE</span>
+        <span class="close-icon" aria-hidden="true">✕</span>
+      </button>
+
       <!-- Phones only: the tab that peeks in at the bottom of the photo -->
       <button type="button" class="hud-sheet-hint"><span>SCROLL FOR DETAILS</span></button>
 

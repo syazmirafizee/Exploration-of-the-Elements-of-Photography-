@@ -273,6 +273,31 @@ function setupCrateGestures() {
 // --------------------------------------------------------------------------
 // 5. Immersive Full-Bleed Takeover Transition
 // --------------------------------------------------------------------------
+// While the full-frame view is open, the page behind it must not scroll.
+// The page scrolls on <html> (its overflow-x: hidden stops <body> from
+// taking over scrolling), so <html> is the element to lock. Hiding the
+// scrollbar would widen the page, so padding of the same width keeps the
+// page, header and dock exactly where they were.
+const SCROLL_LOCK_PADDED = 'body, .swiss-header, .swiss-dock';
+
+function lockPageScroll() {
+  const root = document.documentElement;
+  const scrollbarWidth = window.innerWidth - root.clientWidth;
+  if (scrollbarWidth > 0) {
+    document.querySelectorAll(SCROLL_LOCK_PADDED).forEach(el => {
+      el.style.paddingRight = `${parseFloat(getComputedStyle(el).paddingRight) + scrollbarWidth}px`;
+    });
+  }
+  root.style.overflow = 'hidden';
+}
+
+function unlockPageScroll() {
+  document.documentElement.style.overflow = '';
+  document.querySelectorAll(SCROLL_LOCK_PADDED).forEach(el => {
+    el.style.paddingRight = '';
+  });
+}
+
 function openFullBleedTakeover() {
   playShutterSound();
   const data = portfolioData[currentIndex];
@@ -306,7 +331,7 @@ function openFullBleedTakeover() {
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
   modal.scrollTop = 0;
-  document.body.style.overflow = 'hidden';
+  lockPageScroll();
 }
 
 function closeFullBleedTakeover() {
@@ -314,7 +339,7 @@ function closeFullBleedTakeover() {
   const modal = document.getElementById('fullBleedModal');
   modal.classList.remove('active', 'sheet-open');
   modal.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = '';
+  unlockPageScroll();
 }
 
 // Phones and portrait screens: the full-frame view scrolls, and the details
