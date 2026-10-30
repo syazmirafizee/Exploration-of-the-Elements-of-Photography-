@@ -70,20 +70,23 @@ function playShutterSound() {}
 // --------------------------------------------------------------------------
 // 3. Tactile Lens Crate Controller
 // --------------------------------------------------------------------------
-function updateStagePosition() {
+// Center the active card in the middle of the stage at every screen size.
+// offsetLeft/offsetWidth are measured from the real layout (they ignore the
+// scale transform), so this stays correct as the cards resize with the screen.
+function centerActiveCard() {
   const track = document.getElementById('crateTrack');
   const wrapper = document.getElementById('crateWrapper');
+  const activeItem = document.querySelectorAll('.photo-card-item')[currentIndex];
+  if (!track || !wrapper || !activeItem) return;
+  const offset = wrapper.clientWidth / 2 - (activeItem.offsetLeft + activeItem.offsetWidth / 2);
+  track.style.transform = `translateX(${offset}px)`;
+}
+
+function updateStagePosition() {
   const items = document.querySelectorAll('.photo-card-item');
   const indexBtns = document.querySelectorAll('.index-num-btn');
-  const activeItem = items[currentIndex];
 
-  // Center the active card in the middle of the stage at every screen size.
-  // offsetLeft/offsetWidth are measured from the real layout (they ignore the
-  // scale transform), so this stays correct if card sizes or gaps change in CSS.
-  if (activeItem) {
-    const offset = wrapper.clientWidth / 2 - (activeItem.offsetLeft + activeItem.offsetWidth / 2);
-    track.style.transform = `translateX(${offset}px)`;
-  }
+  centerActiveCard();
 
   // Update classes
   items.forEach((item, idx) => {
@@ -169,32 +172,122 @@ function updateLinerNotes(index) {
 // --------------------------------------------------------------------------
 // 4. Mouse Wheel & Drag Interaction (Momentum on Crate)
 // --------------------------------------------------------------------------
+// Smoothly bring the element details (title, critique, specs) below the
+// gallery into view, just under the fixed header.
+function scrollToDetails() {
+  const details = document.getElementById('elementDetails');
+  const header = document.querySelector('.swiss-header');
+  if (!details) return;
+  const top = details.getBoundingClientRect().top + window.scrollY
+    - (header ? header.offsetHeight : 0) - 24;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+
+// "Next" from a scroll, swipe or drag: go to the next card or, once the last
+// card is showing, carry on down to the details section.
+function gestureNext() {
+  if (currentIndex < portfolioData.length - 1) {
+    stepLens(1);
+    return 'card';
+  }
+  scrollToDetails();
+  return 'details';
+}
+
+// "Previous" from a scroll, swipe or drag: stop at the first card instead of
+// looping round to the last one.
+function gesturePrev() {
+  if (currentIndex > 0) stepLens(-1);
+}
+
 function setupCrateGestures() {
   const wrapper = document.getElementById('crateWrapper');
   if (!wrapper) return;
 
-  // A. Mouse Wheel Navigation (Vertical scroll flips horizontally)
-  let wheelTimeout = null;
-  wrapper.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    if (wheelTimeout) return;
-    
-    if (e.deltaY > 25 || e.deltaX > 25) {
-      stepLens(1);
-    } else if (e.deltaY < -25 || e.deltaX < -25) {
-      stepLens(-1);
+  // A. Mouse wheel / trackpad
+  // While the gallery sits at the top of the page, scrolling over the slider
+  // flips through the cards. Scrolling on past the last card glides down to the
+  // details; everywhere else the wheel scrolls the page normally.
+  const WHEEL_MIN_DELTA = 25;   // ignore tiny trackpad jitter
+  const GESTURE_GAP_MS = 250;   // a pause this long starts a new scroll gesture
+  const STEP_COOLDOWN_MS = 350; // minimum time between card changes
+  let lastWheelTime = 0;
+  let lastPageScrollTime = 0;
+  let gestureId = 0;
+  let gestureAtHome = false;    // did this gesture start with the gallery in place?
+  let lastStepGesture = -1;     // gesture that last changed the card
+  let detailsGesture = -1;      // gesture that started the glide to the details
+  let wheelLocked = false;
+
+  window.addEventListener('scroll', () => {
+    lastPageScrollTime = performance.now();
+  }, { passive: true });
+
+  window.addEventListener('wheel', (e) => {
+    if (!document.getElementById('crateView').classList.contains('active')) return;
+
+    const now = performance.now();
+    if (now - lastWheelTime > GESTURE_GAP_MS) {
+      gestureId++;
+      // A gesture that starts while the page is moving (e.g. momentum from
+      // scrolling back up) never flips cards.
+      gestureAtHome = window.scrollY <= 4 && now - lastPageScrollTime > GESTURE_GAP_MS;
+    }
+    lastWheelTime = now;
+
+    // Let the glide to the details finish instead of fighting it.
+    if (gestureId === detailsGesture) {
+      e.preventDefault();
+      return;
     }
 
-    wheelTimeout = setTimeout(() => {
-      wheelTimeout = null;
-    }, 350);
+    // Only scrolling over the slider, with the page at the top, flips cards.
+    if (!wrapper.contains(e.target) || !gestureAtHome || window.scrollY > 4) return;
+
+    const horizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+    const delta = horizontal ? e.deltaX : e.deltaY;
+
+    // Scrolling back on the first card: nothing to flip back to.
+    if (delta < 0 && currentIndex === 0) {
+      // Block sideways swipes so they do not trigger the browser Back gesture.
+      if (horizontal) e.preventDefault();
+      return;
+    }
+
+    e.preventDefault();
+    if (wheelLocked || Math.abs(delta) < WHEEL_MIN_DELTA) return;
+
+    // The scroll that lands on the last card does not also leave the gallery:
+    // the visitor sees the last photo, then scrolls again to move on.
+    const onLastCard = currentIndex === portfolioData.length - 1;
+    if (delta > 0 && onLastCard && gestureId === lastStepGesture) return;
+
+    if (delta > 0) {
+      if (gestureNext() === 'details') {
+        detailsGesture = gestureId;
+        return;
+      }
+    } else {
+      gesturePrev();
+    }
+    lastStepGesture = gestureId;
+    wheelLocked = true;
+    setTimeout(() => { wheelLocked = false; }, STEP_COOLDOWN_MS);
   }, { passive: false });
 
-  // B. Touch / Mouse Drag
+  // B. Mouse drag (desktop)
+  let suppressClick = false;
+
+  // Stop the browser from dragging the photo itself, which would swallow the
+  // mouse-up and leave the drag unfinished.
+  wrapper.addEventListener('dragstart', (e) => e.preventDefault());
+
   wrapper.addEventListener('mousedown', (e) => {
     isDragging = true;
     startX = e.clientX;
     dragDistance = 0;
+    suppressClick = false;
   });
 
   window.addEventListener('mousemove', (e) => {
@@ -205,29 +298,41 @@ function setupCrateGestures() {
   window.addEventListener('mouseup', () => {
     if (!isDragging) return;
     isDragging = false;
-    if (dragDistance > 60) {
-      stepLens(-1);
-    } else if (dragDistance < -60) {
-      stepLens(1);
-    }
+    if (Math.abs(dragDistance) <= 60) return;
+    // A drag must not also count as a click on the card under the pointer:
+    // that click would select the old card again and undo the drag.
+    suppressClick = true;
+    if (dragDistance < 0) gestureNext(); else gesturePrev();
   });
 
-  // Touch Support
+  wrapper.addEventListener('click', (e) => {
+    if (!suppressClick) return;
+    suppressClick = false;
+    e.stopPropagation();
+    e.preventDefault();
+  }, true);
+
+  // C. Touch (phones and tablets)
+  // Sideways swipes change the card and, past the last card, glide down to the
+  // details. Mostly-vertical swipes are left to the browser to scroll the page.
+  let startY = 0;
+  let dragY = 0;
+
   wrapper.addEventListener('touchstart', (e) => {
     startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
     dragDistance = 0;
+    dragY = 0;
   }, { passive: true });
 
   wrapper.addEventListener('touchmove', (e) => {
     dragDistance = e.touches[0].clientX - startX;
+    dragY = e.touches[0].clientY - startY;
   }, { passive: true });
 
   wrapper.addEventListener('touchend', () => {
-    if (dragDistance > 50) {
-      stepLens(-1);
-    } else if (dragDistance < -50) {
-      stepLens(1);
-    }
+    if (Math.abs(dragDistance) < 50 || Math.abs(dragY) > Math.abs(dragDistance)) return;
+    if (dragDistance < 0) gestureNext(); else gesturePrev();
   });
 
   // Keyboard Navigation
@@ -408,6 +513,13 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStagePosition();
 });
 
-window.addEventListener('resize', () => {
-  updateStagePosition();
+// Keep the active card centered whenever the stage changes size (window
+// resize, fonts loading, cards resizing to fit the screen height).
+document.addEventListener('DOMContentLoaded', () => {
+  const stage = document.getElementById('crateWrapper');
+  if (stage && 'ResizeObserver' in window) {
+    new ResizeObserver(centerActiveCard).observe(stage);
+  } else {
+    window.addEventListener('resize', centerActiveCard);
+  }
 });

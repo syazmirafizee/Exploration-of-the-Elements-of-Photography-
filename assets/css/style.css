@@ -34,6 +34,10 @@
   --transition-fast: 0.22s var(--ease-a24);
   --transition-mid: 0.45s var(--ease-a24);
   --transition-slow: 0.75s var(--ease-a24);
+
+  /* Space reserved for the fixed top header and bottom dock */
+  --header-h: 64px;
+  --dock-h: 56px;
 }
 
 /* Darkroom Noir Mode */
@@ -260,8 +264,8 @@ html, body {
    4. Viewports & Transitions
    -------------------------------------------------------------------------- */
 .main-viewport {
-  padding-top: 64px;
-  padding-bottom: 56px;
+  padding-top: var(--header-h);
+  padding-bottom: var(--dock-h);
   min-height: 100vh;
   position: relative;
 }
@@ -297,6 +301,18 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+/* First screen of the gallery (name line, slider, arrows). It fills exactly the
+   space between the fixed header and the bottom dock, so the element details
+   below only appear once the visitor scrolls. 1.5rem = #crateView top padding. */
+.stage-hero {
+  /* Grid (not flex) so the slider row gets a definite height that the cards
+     can size themselves from (container query units). */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: calc(100vh - var(--header-h) - var(--dock-h) - 1.5rem);
+  min-height: calc(100svh - var(--header-h) - var(--dock-h) - 1.5rem);
 }
 
 .stage-eyebrow {
@@ -351,7 +367,10 @@ html, body {
 .crate-stage-wrapper {
   position: relative;
   width: 100%;
-  height: 560px; /* room for the 112% active card + its shadow and label */
+  /* Takes all the height left in .stage-hero, but never less than the smallest
+     card needs: (card 410 + shadow/label 68) x 1.12 zoom + 16 breathing room */
+  min-height: calc((410px + 68px) * 1.12 + 16px);
+  container-type: size; /* lets the cards size themselves from this box */
   display: flex;
   align-items: center;
   justify-content: flex-start; /* track starts at the left; JS centers the active card */
@@ -366,6 +385,10 @@ html, body {
 }
 
 .crate-track {
+  /* Card height: as tall as the stage allows after the 112% zoom, floor shadow
+     and label; never below the original 410px or above 680px, and narrow
+     enough to leave the neighbouring cards in view. */
+  --card-h: clamp(410px, min(calc((100cqh - 16px) / 1.12 - 68px), 80cqw), 680px);
   display: flex;
   align-items: center;
   gap: 5.5rem;
@@ -377,7 +400,7 @@ html, body {
 /* SWISS PHOTOGRAPHIC CARD (Rectangular Fine-Art Mount) */
 .photo-card-item {
   position: relative;
-  width: 310px;
+  width: calc(var(--card-h) * 310 / 410); /* keeps the original 310 x 410 shape */
   height: auto; /* grows to fit the card, floor shadow and label */
   display: flex;
   flex-direction: column;
@@ -398,7 +421,7 @@ html, body {
 .card-outer-wrapper {
   position: relative;
   width: 100%;
-  height: 410px; /* the card itself owns the fixed size */
+  height: var(--card-h); /* the card itself owns the size */
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -1706,8 +1729,8 @@ html, body {
     font-size: 0.62rem;
     line-height: 1.25;
   }
-  .main-viewport {
-    padding-top: 112px; /* matches the taller two-row header (~111px) */
+  :root {
+    --header-h: 112px; /* the two-row header is ~111px tall */
   }
   /* Eyebrow: name + catalogue ref on the first line, element tag and
      discipline side by side underneath */
@@ -1729,16 +1752,13 @@ html, body {
     white-space: nowrap;
   }
   .crate-stage-wrapper {
-    height: 480px;
+    min-height: calc((340px + 68px) * 1.08 + 16px);
   }
   .crate-track {
+    /* Phones: same fit-to-screen rule, kept close to the original 340px card
+       (at most 400px, and limited by the screen width) */
+    --card-h: clamp(340px, min(calc((100cqh - 16px) / 1.08 - 68px), 92cqw), 400px);
     gap: 2.5rem;
-  }
-  .photo-card-item {
-    width: 250px;
-  }
-  .card-outer-wrapper {
-    height: 340px;
   }
   .photo-card-item.active {
     transform: scale(1.08);
