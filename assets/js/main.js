@@ -172,108 +172,29 @@ function updateLinerNotes(index) {
 // --------------------------------------------------------------------------
 // 4. Mouse Wheel & Drag Interaction (Momentum on Crate)
 // --------------------------------------------------------------------------
-// Smoothly bring the element details (title, critique, specs) below the
-// gallery into view, just under the fixed header.
-function scrollToDetails() {
-  const details = document.getElementById('elementDetails');
-  const header = document.querySelector('.swiss-header');
-  if (!details) return;
-  const top = details.getBoundingClientRect().top + window.scrollY
-    - (header ? header.offsetHeight : 0) - 24;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
-}
-
-// "Next" from a scroll, swipe or drag: go to the next card or, once the last
-// card is showing, carry on down to the details section.
-function gestureNext() {
-  if (currentIndex < portfolioData.length - 1) {
-    stepLens(1);
-    return 'card';
-  }
-  scrollToDetails();
-  return 'details';
-}
-
-// "Previous" from a scroll, swipe or drag: stop at the first card instead of
-// looping round to the last one.
-function gesturePrev() {
-  if (currentIndex > 0) stepLens(-1);
-}
-
 function setupCrateGestures() {
   const wrapper = document.getElementById('crateWrapper');
   if (!wrapper) return;
 
   // A. Mouse wheel / trackpad
-  // While the gallery sits at the top of the page, scrolling over the slider
-  // flips through the cards. Scrolling on past the last card glides down to the
-  // details; everywhere else the wheel scrolls the page normally.
-  const WHEEL_MIN_DELTA = 25;   // ignore tiny trackpad jitter
-  const GESTURE_GAP_MS = 250;   // a pause this long starts a new scroll gesture
-  const STEP_COOLDOWN_MS = 350; // minimum time between card changes
-  let lastWheelTime = 0;
-  let lastPageScrollTime = 0;
-  let gestureId = 0;
-  let gestureAtHome = false;    // did this gesture start with the gallery in place?
-  let lastStepGesture = -1;     // gesture that last changed the card
-  let detailsGesture = -1;      // gesture that started the glide to the details
-  let wheelLocked = false;
+  // Scrolling up and down always scrolls the page, so the visitor can read the
+  // details of the card they are on. Sideways trackpad swipes over the slider
+  // flip through the cards.
+  let wheelTimeout = null;
+  wrapper.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // vertical: scroll the page
+    e.preventDefault(); // also stops the browser's swipe-to-go-back gesture
+    if (wheelTimeout) return;
 
-  window.addEventListener('scroll', () => {
-    lastPageScrollTime = performance.now();
-  }, { passive: true });
-
-  window.addEventListener('wheel', (e) => {
-    if (!document.getElementById('crateView').classList.contains('active')) return;
-
-    const now = performance.now();
-    if (now - lastWheelTime > GESTURE_GAP_MS) {
-      gestureId++;
-      // A gesture that starts while the page is moving (e.g. momentum from
-      // scrolling back up) never flips cards.
-      gestureAtHome = window.scrollY <= 4 && now - lastPageScrollTime > GESTURE_GAP_MS;
-    }
-    lastWheelTime = now;
-
-    // Let the glide to the details finish instead of fighting it.
-    if (gestureId === detailsGesture) {
-      e.preventDefault();
-      return;
+    if (e.deltaX > 25) {
+      stepLens(1);
+    } else if (e.deltaX < -25) {
+      stepLens(-1);
     }
 
-    // Only scrolling over the slider, with the page at the top, flips cards.
-    if (!wrapper.contains(e.target) || !gestureAtHome || window.scrollY > 4) return;
-
-    const horizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-    const delta = horizontal ? e.deltaX : e.deltaY;
-
-    // Scrolling back on the first card: nothing to flip back to.
-    if (delta < 0 && currentIndex === 0) {
-      // Block sideways swipes so they do not trigger the browser Back gesture.
-      if (horizontal) e.preventDefault();
-      return;
-    }
-
-    e.preventDefault();
-    if (wheelLocked || Math.abs(delta) < WHEEL_MIN_DELTA) return;
-
-    // The scroll that lands on the last card does not also leave the gallery:
-    // the visitor sees the last photo, then scrolls again to move on.
-    const onLastCard = currentIndex === portfolioData.length - 1;
-    if (delta > 0 && onLastCard && gestureId === lastStepGesture) return;
-
-    if (delta > 0) {
-      if (gestureNext() === 'details') {
-        detailsGesture = gestureId;
-        return;
-      }
-    } else {
-      gesturePrev();
-    }
-    lastStepGesture = gestureId;
-    wheelLocked = true;
-    setTimeout(() => { wheelLocked = false; }, STEP_COOLDOWN_MS);
+    wheelTimeout = setTimeout(() => {
+      wheelTimeout = null;
+    }, 350);
   }, { passive: false });
 
   // B. Mouse drag (desktop)
@@ -302,7 +223,7 @@ function setupCrateGestures() {
     // A drag must not also count as a click on the card under the pointer:
     // that click would select the old card again and undo the drag.
     suppressClick = true;
-    if (dragDistance < 0) gestureNext(); else gesturePrev();
+    stepLens(dragDistance < 0 ? 1 : -1);
   });
 
   wrapper.addEventListener('click', (e) => {
@@ -313,8 +234,8 @@ function setupCrateGestures() {
   }, true);
 
   // C. Touch (phones and tablets)
-  // Sideways swipes change the card and, past the last card, glide down to the
-  // details. Mostly-vertical swipes are left to the browser to scroll the page.
+  // Sideways swipes change the card. Mostly-vertical swipes are left to the
+  // browser, so swiping up scrolls down to the details.
   let startY = 0;
   let dragY = 0;
 
@@ -332,7 +253,7 @@ function setupCrateGestures() {
 
   wrapper.addEventListener('touchend', () => {
     if (Math.abs(dragDistance) < 50 || Math.abs(dragY) > Math.abs(dragDistance)) return;
-    if (dragDistance < 0) gestureNext(); else gesturePrev();
+    stepLens(dragDistance < 0 ? 1 : -1);
   });
 
   // Keyboard Navigation
